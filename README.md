@@ -490,3 +490,286 @@ This database can be expanded by adding:
 ## 📜 License
 
 This project is created for **educational and learning purposes**.
+
+-- ==========================================
+-- NORMALIZATION OF COLLEGE DATABASE
+-- NORMAL FORM: 1NF -> 2NF -> 3NF
+-- ==========================================
+
+-- Create Database
+CREATE DATABASE college_zoro;
+
+-- Use Database
+USE college_zoro;
+
+
+
+
+
+
+-- ==========================================
+-- 1NF
+-- ==========================================
+-- In 1NF:
+-- 1. Each column contains atomic values.
+-- 2. There are no repeating groups.
+-- 3. Each row is uniquely identifiable.
+
+-- Example:
+-- Student information is stored with one value
+-- in each column.
+
+
+-- ==========================================
+-- 2NF
+-- ==========================================
+-- In 2NF:
+-- 1. Database must be in 1NF.
+-- 2. There should be no partial dependency.
+--
+-- Student, Course and Department information
+-- are separated into different tables.
+
+
+-- ==========================================
+-- DEPARTMENT TABLE
+-- ==========================================
+
+CREATE TABLE department (
+    dept_id INT PRIMARY KEY,
+    dept_name VARCHAR(50) UNIQUE NOT NULL
+);
+
+
+-- ==========================================
+-- STUDENT TABLE
+-- ==========================================
+
+CREATE TABLE student (
+    roll_no INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    email VARCHAR(50) UNIQUE,
+    aadhar_no VARCHAR(12) UNIQUE,
+    dept_id INT,
+
+    FOREIGN KEY (dept_id)
+    REFERENCES department(dept_id)
+);
+
+
+-- ==========================================
+-- COURSE TABLE
+-- ==========================================
+
+CREATE TABLE course (
+    course_id INT PRIMARY KEY,
+    course_name VARCHAR(50) NOT NULL,
+    dept_id INT,
+
+    FOREIGN KEY (dept_id)
+    REFERENCES department(dept_id)
+);
+
+
+-- ==========================================
+-- ENROLLMENT TABLE
+-- ==========================================
+-- Composite primary key is used because
+-- a student can enroll in multiple courses
+-- and can have different semesters.
+
+CREATE TABLE enrollment (
+    roll_no INT,
+    course_id INT,
+    semester INT CHECK (semester BETWEEN 1 AND 8),
+    grade CHAR(2),
+
+    PRIMARY KEY (roll_no, course_id, semester),
+
+    FOREIGN KEY (roll_no)
+    REFERENCES student(roll_no),
+
+    FOREIGN KEY (course_id)
+    REFERENCES course(course_id)
+);
+
+
+-- ==========================================
+-- FACULTY TABLE
+-- ==========================================
+
+CREATE TABLE faculty (
+    faculty_id INT PRIMARY KEY,
+    faculty_name VARCHAR(50) NOT NULL,
+    email VARCHAR(50) UNIQUE,
+    phone_no VARCHAR(15) UNIQUE,
+    dept_id INT,
+
+    FOREIGN KEY (dept_id)
+    REFERENCES department(dept_id)
+);
+
+
+-- ==========================================
+-- INSERT DEPARTMENT DATA
+-- ==========================================
+
+INSERT INTO department (dept_id, dept_name) VALUES
+(1, 'Computer Science'),
+(2, 'Mechanical'),
+(3, 'Electronics');
+
+
+-- ==========================================
+-- INSERT STUDENT DATA
+-- ==========================================
+
+INSERT INTO student
+(roll_no, name, email, aadhar_no, dept_id)
+VALUES
+(101, 'Laksh Kapse', 'laksh@example.com',
+ '123456789012', 1),
+
+(102, 'Varun Gharote', 'varuniversel@example.com',
+ '234567890123', 2),
+
+(103, 'Deep Kuswha', 'deep@example.com',
+ '345678901234', 1);
+
+
+-- ==========================================
+-- INSERT COURSE DATA
+-- ==========================================
+
+INSERT INTO course
+(course_id, course_name, dept_id)
+VALUES
+(201, 'Database Systems', 1),
+(202, 'Thermodynamics', 2),
+(203, 'Digital Circuits', 3);
+
+
+-- ==========================================
+-- INSERT ENROLLMENT DATA
+-- ==========================================
+
+INSERT INTO enrollment
+(roll_no, course_id, semester, grade)
+VALUES
+(101, 201, 3, 'A'),
+(101, 203, 4, 'B'),
+(102, 202, 3, 'A'),
+(103, 201, 3, 'B');
+
+
+-- ==========================================
+-- INSERT FACULTY DATA
+-- ==========================================
+
+INSERT INTO faculty
+(faculty_id, faculty_name, email, phone_no, dept_id)
+VALUES
+(201, 'Dr. Sharma', 'sharma@gmail.com',
+ '9876543210', 1),
+
+(202, 'Prof. Mehta', 'mehta@gmail.com',
+ '9876543211', 2),
+
+(203, 'Dr. Rao', 'rao@gmail.com',
+ '9876543212', 3);
+
+
+-- ==========================================
+-- DISPLAY TABLES
+-- ==========================================
+
+SHOW TABLES;
+
+
+-- ==========================================
+-- DESCRIBE TABLES
+-- ==========================================
+
+DESC department;
+DESC student;
+DESC course;
+DESC enrollment;
+DESC faculty;
+
+
+
+
+
+
+Normalization structure
+-- ==========================================
+-- DISPLAY DATA
+-- ==========================================
+
+SELECT * FROM department;
+SELECT * FROM student;
+SELECT * FROM course;
+SELECT * FROM enrollment;
+SELECT * FROM faculty;
+
+UNNORMALIZED TABLE
+        |
+        v
+      1NF
+        |
+        |-- Atomic values
+        |-- No repeating groups
+        |
+        v
+      2NF
+        |
+        |-- Remove partial dependency
+        |-- Separate Student/Course/Department
+        |
+        v
+      3NF
+        |
+        |-- Remove transitive dependency
+        |-- Department details stored separately
+        |
+        v
+NORMALIZED DATABASE
+
+
+Department
+-----------
+dept_id (PK)
+dept_name
+
+
+Student
+-----------
+roll_no (PK)
+name
+email
+aadhar_no
+dept_id (FK)
+
+
+Course
+-----------
+course_id (PK)
+course_name
+dept_id (FK)
+
+
+Enrollment
+-----------
+roll_no (PK, FK)
+course_id (PK, FK)
+semester (PK)
+grade
+
+
+Faculty
+-----------
+faculty_id (PK)
+faculty_name
+email
+phone_no
+dept_id (FK)
